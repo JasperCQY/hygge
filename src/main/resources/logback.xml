@@ -8,7 +8,7 @@
     </contextListener>
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder charset="UTF-8">
-            <pattern>[%d{yyyy-MM-dd HH:mm:ss} %highlight(%-5p) ] %X{THREAD_ID} %msg%n</pattern><!--%logger.%M\(%F:%L\)  //输出指定的详细信息-->
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss:SSS} %highlight(%-5p)] %X{THREAD_ID} %msg%n</pattern><!--%logger.%M\(%F:%L\)  //输出指定的详细信息-->
         </encoder>
     </appender>
     <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -24,7 +24,7 @@
             <totalSizeCap>20GB</totalSizeCap>
         </rollingPolicy>
         <encoder>
-            <pattern>[%date{yyyy-MM-dd HH:mm:ss}] [%-5level] [%logger:%line] --%mdc{client} %msg%n</pattern>
+            <pattern>[%date{yyyy-MM-dd HH:mm:ss:SSS}] [%-5level] [%logger:%line] --%mdc{client} %msg%n</pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>INFO</level>
@@ -42,7 +42,7 @@
             <totalSizeCap>20GB</totalSizeCap>
         </rollingPolicy>
         <encoder>
-            <pattern>[%date{yyyy-MM-dd HH:mm:ss}] [%-5level] [%logger:%line] --%mdc{client} %msg%n</pattern>
+            <pattern>[%date{yyyy-MM-dd HH:mm:ss:SSS}] [%-5level] [%logger:%line] --%mdc{client} %msg%n</pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
@@ -60,7 +60,7 @@
             <totalSizeCap>50GB</totalSizeCap>
         </rollingPolicy>
         <encoder>
-            <pattern>[%date{yyyy-MM-dd HH:mm:ss}] [%-5level] [%logger:%line] --%mdc{client} %msg%n</pattern>
+            <pattern>[%date{yyyy-MM-dd HH:mm:ss:SSS}] [%-5level] [%logger:%line] --%mdc{client} %msg%n</pattern>
         </encoder>
     </appender>
     <root level="INFO">
