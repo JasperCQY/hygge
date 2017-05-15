@@ -15,7 +15,7 @@ import com.szyooge.util.HttpUtil;
 
 @Controller
 public class HttpController {
-	@RequestMapping(value="httpGet")
+	@RequestMapping(value="/httpGet")
 	public void httpGet(HttpServletRequest request, HttpServletResponse response){
 		Map<String,String> params = new HashMap<String,String>();
 		String name = null;
