@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.szyooge.util.CryptUtil;
+import com.szyooge.util.SortUtil;
 
 @Controller
 public class DefaultController {
@@ -29,12 +30,13 @@ public class DefaultController {
         String timestamp = request.getParameter("timestamp");
         String nonce = request.getParameter("nonce");
         String echostr = request.getParameter("echostr");
-        String sha1 = token + timestamp + nonce;
+        String sha1 = SortUtil.dictionarySort(nonce,timestamp,token);
         logger.info("token:" + token);
         logger.info("timestamp:" + timestamp);
         logger.info("nonce:" + nonce);
         logger.info("echostr:" + echostr);
         logger.info("signature：" + signature);
+        logger.info("字典顺序排序:" + sha1);
         sha1 = CryptUtil.SHA1ToHex(sha1);
         
         if (sha1 != null && sha1.equals(signature)) {

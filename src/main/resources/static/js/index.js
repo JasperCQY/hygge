@@ -3,25 +3,30 @@ var index = {
         
     },
     getAccessToken : function(){
-        $.ajax({
-            url       : "httpGet",
-            type      : "GET",
-            data      : {
-            	url        : "https://api.weixin.qq.com/cgi-bin/token",
-            	grant_type : "client_credential",
-                appid      : $("#appid").val(),
-                secret     : $("#appsecret").val()
-            },
-            dataType  : "json",
-            success   : function(data){
-                // data 格式{"access_token":"ACCESS_TOKEN","expires_in":7200}，expires_in有效时间
-                console.log(data);
-                $("#accesstoken").val(data.access_token);
-                $("#expiresin").val(data.expires_in);
-            },
-            error     : function(data){
-            	console.log(data);
-            }
+        var data = wechat.public.getAccessToken({
+            appid      : $("#appid").val(),
+            secret     : $("#appsecret").val()
         });
+        $("#accesstoken").val(data.access_token);
+        $("#expiresin").val(data.expires_in);
+    },
+    getcallbackip : function(){
+        var data = wechat.public.getcallbackip({
+            access_token:$("#accesstoken").val()
+        });
+        $("#console").val(JSON.stringify(data));
+    },
+    menu : {
+        create : function(){
+            var data = wechat.public.menu.create($("#accesstoken").val(),{
+                button:[{  
+                   "type":"click",
+                   "name":"今日歌曲",
+                   "key":"v1001_today_music",
+                   url : "http://www.yooge.xin/hygger/wechatpush/menuclick"
+                }]
+            });
+            $("#console").val(JSON.stringify(data));
+        }
     }
 }
