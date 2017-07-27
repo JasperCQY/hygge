@@ -1,11 +1,7 @@
 /**
  * 微信接口
  */
-var wechat = {};
-/**
- * 微信公众号处理接口。（所有的access_token值都可以为空）
- */
-wechat.public = {
+var wechat = {
     /**
      * 调用微信的方法
      * @param opts 主要参数{url:'', data:'', jsonData:''} <br/>
@@ -40,7 +36,45 @@ wechat.public = {
         https.request(requestOpts);
         return resultData;
     },
-    
+    /**
+     * @param opts 可选
+     * @param jsonData 必填
+     * @param url 必填， 
+     * @param method 可选
+     */
+    opration : function(opts, jsonData, url, method){
+        // url为空或不是http开头，证明前面有参数缺失
+        if((!url) || url.indexOf('http') == -1) {
+            // opts没填的情况
+            if(opts && "object" == typeof(opts)) {
+                if(!opts.access_token) {
+                    // 无opts
+                    jsonData = opts;
+                    opts = null;
+                }
+            }
+        }
+        
+        var params = {
+            url  : url,
+            jsonData : jsonData
+        };
+        if(opts){
+            if("object" == typeof(opts)) {
+                params.data = opts;
+            } else {
+                params.data = {access_token:opts};
+            }
+        }
+        if(!method) params.type = "get";
+        return wechat.callwechat(params);
+    },
+};
+
+/**
+ * 微信公众号处理接口。（所有的access_token值都可以为空）
+ */
+wechat.public = {
     /**
      * 获取access_token
      * @param opts 调用时需要的参数{appid:'', secret''}
@@ -49,7 +83,7 @@ wechat.public = {
     getAccessToken : function(opts){
         var params = {grant_type : "client_credential"};
         $.extend(params,opts);
-        return wechat.public.callwechat({
+        return wechat.callwechat({
             url : "https://api.weixin.qq.com/cgi-bin/token",
             data : params
         });
@@ -69,69 +103,105 @@ wechat.public = {
                 params.data = {access_token:opts};
             }
         }
-        return wechat.public.callwechat(params);
+        return wechat.callwechat(params);
+    }
+};
+/**
+ * 自定义菜单操作
+ */
+wechat.public.menu = {
+    /**
+     * @param opts {access_token : ACCESS_TOKEN}  选填<br/>
+     * @param jsonData <br/>
+     * {                                  <br/>
+     *     button       : [{              <br/>
+     *         "type":"click",             <br/>
+     *         "name":"今日歌曲",              <br/>
+     *         "key":"V1001_TODAY_MUSIC"     <br/>
+     *     }]                                 <br/>
+     * }                                       <br/>
+     * 
+     * @return 正确{"errcode":0,"errmsg":"ok"}，错误{"errcode":40018,"errmsg":"invalid button name size"}
+     */
+    create : function(opts,jsonData){
+        return wechat.opration(opts, jsonData, "https://api.weixin.qq.com/cgi-bin/menu/create", "post");
     },
     /**
-     * 自定义菜单操作
+     * 获取所有的菜单
      */
-    menu : {
+    get : function(opts, jsonData){
+        return wechat.opration(opts, jsonData, "https://api.weixin.qq.com/cgi-bin/menu/get");
+    },
+    /**
+     * 删除所有的菜单
+     */
+    "delete" : function() {
+        return wechat.opration(opts, jsonData, "https://api.weixin.qq.com/cgi-bin/menu/delete");
+    }
+};
+
+/**
+ * 消息发送
+ */
+wechat.public.message = {
+    /**
+     * 客服
+     */
+    custom : {
         /**
-         * @param opts 可选
-         * @param jsonData 必填
-         * @param url 必填， 
-         * @param method 可选
+         * 客服消息发送
          */
-        opration : function(opts, jsonData, url, method){
-            // opts没填的情况
-            if(opts && "object" == typeof(opts)) {
-                if(!opts.access_token) {
-                    // 无opts
-                    jsonData = opts;
-                    opts = null;
-                }
-            }
-            
-            var params = {
-                url  : url,
-                jsonData : jsonData
-            };
-            if(opts){
-                if("object" == typeof(opts)) {
-                    params.data = opts;
-                } else {
-                    params.data = {access_token:opts};
-                }
-            }
-            if(!method) params.type = "get";
-            return wechat.public.callwechat(params);
-        },
-        /**
-         * @param opts {access_token : ACCESS_TOKEN}  选填<br/>
-         * @param jsonData <br/>
-         * {                                  <br/>
-         *     button       : [{              <br/>
-         *         "type":"click",             <br/>
-         *         "name":"今日歌曲",              <br/>
-         *         "key":"V1001_TODAY_MUSIC"     <br/>
-         *     }]                                 <br/>
-         * }                                       <br/>
-         * 
-         * @return 正确{"errcode":0,"errmsg":"ok"}，错误{"errcode":40018,"errmsg":"invalid button name size"}
-         */
-        create : function(opts,jsonData){
-            return wechat.public.menu.opration(opts, jsonData, "https://api.weixin.qq.com/cgi-bin/menu/create", "post");
-        },
-        /**
-         * 获取所有的菜单
-         */
-        get : function(opts, jsonData){
-            return wechat.public.menu.opration(opts, jsonData, "https://api.weixin.qq.com/cgi-bin/menu/get");
-        },
-        /**
-         * 删除所有的菜单
-         */
-        "delete" : function() {
-            return wechat.public.menu.opration(opts, jsonData, "https://api.weixin.qq.com/cgi-bin/menu/delete");
+        send : function(opts, jsonData){
+            return wechat.opration(opts, jsonData, "https://api.weixin.qq.com/cgi-bin/message/custom/send", "post");
         }
+    }
+};
+
+/**
+ * 客服消息
+ */
+wechat.public.customservice = {
+    kfaccount : {
+        add : function(opts, jsonData){
+            return wechat.opration(opts, jsonData, "https://api.weixin.qq.com/customservice/kfaccount/add", "post");
+        },
+        update : function(opts){
+            return wechat.opration(opts, null, "https://api.weixin.qq.com/customservice/kfaccount/update", "post");
+        },
+        "delete" : function(opts, jsonData){
+            return wechat.opration(opts, jsonData, "https://api.weixin.qq.com/customservice/kfaccount/del");
+        },
+        uploadheadimg : function(opts, jsonData){
+            return wechat.opration(opts, jsonData, "http://api.weixin.qq.com/customservice/kfaccount/uploadheadimg", "post");
+        },
+        getkflist : function(){
+            return wechat.opration(null, null, "https://api.weixin.qq.com/cgi-bin/customservice/getkflist");
+        }
+    }
+};
+
+/**
+ * 关注用户
+ */
+wechat.public.user = {
+    info : function(opts){
+        var params = {lang : "zh_CN"};
+        $.extend(params,opts);
+        return wechat.callwechat({
+            url : "https://api.weixin.qq.com/cgi-bin/user/info",
+            data : params
+        });
+    },
+    infos : function(opts, jsonData){
+        return wechat.opration(opts, jsonData, "https://api.weixin.qq.com/cgi-bin/user/info/batchget", "post");
+    },
+    getlist : function(opts){
+        if('object' != typeof(opts)) {
+            opts = { next_openid : opts };
+        }
+        return wechat.callwechat({
+            url : "https://api.weixin.qq.com/cgi-bin/user/get",
+            data : opts
+        });
     }
 };

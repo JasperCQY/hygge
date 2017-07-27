@@ -26,7 +26,7 @@ public class WeChatTokenSche extends SimpleScheduled {
     
     @Override
     protected String setExpression() {
-        this.expression = "0 0/30 0/1 * * ?";
+        this.expression = "0 0 0/1 * * ?";
         return this.expression;
     }
     

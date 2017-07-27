@@ -1,14 +1,20 @@
 package com.szyooge.controller;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.szyooge.service.WeChatPushService;
 import com.szyooge.util.CryptUtil;
 import com.szyooge.util.MDC_LOG;
 import com.szyooge.util.SortUtil;
@@ -27,6 +33,9 @@ public class WeChatPushController extends BaseController {
     
     @Value("${wechat.config.token}")
     private String token;
+    
+    @Autowired
+    private WeChatPushService weChatPushService;
     
     @RequestMapping("/wechatpush")
     public void wxAccess(HttpServletRequest request, HttpServletResponse response) {
@@ -51,6 +60,34 @@ public class WeChatPushController extends BaseController {
         if (sha1 != null && sha1.equals(signature)) {
             // 消息来自微信
             logger.info("消息来自微信");
+            BufferedReader in = null;
+            try {
+                in = new BufferedReader(new InputStreamReader(request.getInputStream()));
+                // 微信推送部分消息
+                String resultPart = in.readLine();
+                // 微信推送消息
+                StringBuilder wxMsg = new StringBuilder();
+                // 拼凑消息
+                while(resultPart != null) {
+                    wxMsg.append(resultPart);
+                    resultPart = in.readLine();
+                }
+                // 打印微信推送消息
+                logger.info(wxMsg.toString());
+                if(echostr == null) {
+                    echostr = weChatPushService.wxAccess(wxMsg.toString());
+                }
+            } catch (IOException e) {
+                logger.info("读取微信数据失败",e);
+            } finally {
+                if(in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+                        logger.info("读取微信数据失败",e);
+                    }
+                }
+            }
             responseString(response, echostr);
         } else {
             logger.info("消息不是来自微信");
