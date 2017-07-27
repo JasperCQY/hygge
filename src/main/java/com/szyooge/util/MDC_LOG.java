@@ -6,7 +6,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Created by yuelin.zhang on 2017/4/7.
+ * 诊断日志
+ * @ClassName: MDC_LOG
+ * @author quanyou.chen
+ * @date: 2017年7月27日 下午1:32:33
+ * @version  v 1.0
  */
 public class MDC_LOG {
 

@@ -41,11 +41,19 @@ public class StringUtil {
         return new String(buf);
     }
     
-    public static boolean isNotEmpty(String jsonStr) {
-        return !isEmpty(jsonStr);
+    public static boolean isNotNEmpty(String str) {
+        return !isNEmpty(str);
     }
     
-    public static boolean isEmpty(String jsonStr) {
-        return (jsonStr == null || jsonStr.trim().equals(""));
+    public static boolean isNEmpty(String str) {
+        return (str == null || str.trim().equals("") || str.trim().equals("null"));
+    }
+    
+    public static boolean isNotEmpty(String str) {
+        return !isEmpty(str);
+    }
+    
+    public static boolean isEmpty(String str) {
+        return (str == null || str.trim().equals(""));
     }
 }

@@ -3,14 +3,14 @@
  */
 var wechat = {};
 /**
- * 微信公众号处理接口
+ * 微信公众号处理接口。（所有的access_token值都可以为空）
  */
 wechat.public = {
     /**
      * 调用微信的方法
      * @param opts 主要参数{url:'', data:'', jsonData:''} <br/>
      *  url 请求url <br/>
-     *  data 请求参数（如果有jsonData，data会被拼到url中） <br/>
+     *  data 请求参数 <br/>
      *  jsonData 请求参数（复杂参数）  <br/>
      * @return 调用结果
      */
@@ -27,34 +27,12 @@ wechat.public = {
                 resultData = data;
             }
         };
-        
-        // 参数和url处理
-        // 除了jsonData，其他参数全部拼凑到url中
+        // opts参数处理，把opts.jsonData放到opts.data.jsonData，删除opts.jsonData
         if(opts.jsonData){
-            if(opts.data) {
-                // 拼凑URL
-                if(opts.url.indexOf('?') == -1){
-                    opts.url += '?';
-                } else {
-                    opts.url += '&';
-                }
-                // opts.data是否真的有属性
-                var hasProps = false;
-                for(var index in opts.data) {
-                    hasProps = true;
-                    opts.url += (index+'='+opts.data[index]+'&');
-                }
-                if(hasProps) {
-                    // 去掉末尾的&符号
-                    opts.url = opts.url.substring(0,opts.url.length-1)
-                }
-                
-                // 删除opts的data属性
-                delete opts.data;
-                
-                // 重新赋值opts.data
-                opts.data = {jsonData : JSON.stringify(opts.jsonData)};
+            if(!opts.data) {
+                opts.data = {};
             }
+            opts.data.jsonData = JSON.stringify(opts.jsonData);
             // 删除opts.jsonData
             delete opts.jsonData;
         }
@@ -83,32 +61,52 @@ wechat.public = {
      * @return {ip_list : ['127.0.0.1','0.0.0.0']}
      */
     getcallbackip : function(opts) {
-        if("object" != typeof(opts)) {
-            opts = {access_token:opts};
+        var params = {url  : "https://api.weixin.qq.com/cgi-bin/getcallbackip"};
+        if(opts){
+            if("object" == typeof(opts)) {
+                params.data = opts;
+            } else {
+                params.data = {access_token:opts};
+            }
         }
-        return wechat.public.callwechat({
-            url  : "https://api.weixin.qq.com/cgi-bin/getcallbackip",
-            data : opts,
-        });
+        return wechat.public.callwechat(params);
     },
     /**
      * 自定义菜单操作
      */
     menu : {
+        /**
+         * @param opts 可选
+         * @param jsonData 必填
+         * @param url 必填， 
+         * @param method 可选
+         */
         opration : function(opts, jsonData, url, method){
-            if("object" != typeof(opts)) {
-                opts = {access_token:opts};
+            // opts没填的情况
+            if(opts && "object" == typeof(opts)) {
+                if(!opts.access_token) {
+                    // 无opts
+                    jsonData = opts;
+                    opts = null;
+                }
             }
-            if(!method) method = "get";
-            return wechat.public.callwechat({
-                url  : "https://api.weixin.qq.com/cgi-bin/menu/get",
-                type : method,
-                data : opts,
+            
+            var params = {
+                url  : url,
                 jsonData : jsonData
-            });
+            };
+            if(opts){
+                if("object" == typeof(opts)) {
+                    params.data = opts;
+                } else {
+                    params.data = {access_token:opts};
+                }
+            }
+            if(!method) params.type = "get";
+            return wechat.public.callwechat(params);
         },
         /**
-         * @param opts {access_token : ACCESS_TOKEN}  <br/>
+         * @param opts {access_token : ACCESS_TOKEN}  选填<br/>
          * @param jsonData <br/>
          * {                                  <br/>
          *     button       : [{              <br/>
@@ -123,10 +121,16 @@ wechat.public = {
         create : function(opts,jsonData){
             return wechat.public.menu.opration(opts, jsonData, "https://api.weixin.qq.com/cgi-bin/menu/create", "post");
         },
+        /**
+         * 获取所有的菜单
+         */
         get : function(opts, jsonData){
             return wechat.public.menu.opration(opts, jsonData, "https://api.weixin.qq.com/cgi-bin/menu/get");
         },
-        delete : function() {
+        /**
+         * 删除所有的菜单
+         */
+        "delete" : function() {
             return wechat.public.menu.opration(opts, jsonData, "https://api.weixin.qq.com/cgi-bin/menu/delete");
         }
     }

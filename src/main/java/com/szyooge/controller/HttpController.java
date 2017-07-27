@@ -7,11 +7,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.szyooge.config.WeChatConf;
 import com.szyooge.constant.CharSet;
 import com.szyooge.util.HttpUtil;
 import com.szyooge.util.StringUtil;
@@ -25,9 +23,6 @@ import com.szyooge.util.StringUtil;
  */
 @Controller
 public class HttpController extends BaseController {
-    
-    @Autowired
-    private WeChatConf weChatConf;
     
     /**
      * HTTP请求  <br/>
@@ -47,15 +42,7 @@ public class HttpController extends BaseController {
             params.put(name, request.getParameter(name));
         }
         String url = params.remove("url");
-        if (params.get("appid") != null 
-            && weChatConf.getAppId().equals(params.get("appid"))
-            && weChatConf.getAppSecret().equals(params.get("secret"))
-            && weChatConf.getClientCredential().equals(params.get("grant_type"))) {
-            // 本地已经存在的Token，直接返回
-            responseString(response, weChatConf.getAccessTokenJson());
-        } else {
-            responseString(response, HttpUtil.sendGet(url, params, CharSet.UTF8));
-        }
+        responseString(response, HttpUtil.sendGet(url, params, CharSet.UTF8));
     }
     
     /**
@@ -76,15 +63,7 @@ public class HttpController extends BaseController {
             params.put(name, request.getParameter(name));
         }
         String url = params.remove("url");
-        if (params.get("appid") != null 
-            && weChatConf.getAppId().equals(params.get("appid"))
-            && weChatConf.getAppSecret().equals(params.get("secret"))
-            && weChatConf.getClientCredential().equals(params.get("grant_type"))) {
-            // 本地已经存在的Token，直接返回
-            responseString(response, weChatConf.getAccessTokenJson());
-        } else {
-            responseString(response, HttpUtil.sendPost(url, params, CharSet.UTF8));
-        }
+        responseString(response, HttpUtil.sendPost(url, params, CharSet.UTF8));
     }
     
     /**
@@ -100,22 +79,60 @@ public class HttpController extends BaseController {
     public void wxHttpGet(HttpServletRequest request, HttpServletResponse response) {
         String jsonData = request.getParameter("jsonData");
         if (StringUtil.isEmpty(jsonData)) {
-            httpGet(request, response);
-        } else {
-            String url = request.getParameter("url");
-            responseString(response, HttpUtil.wxSendGet(url, jsonData, CharSet.UTF8));
-            
+            String accessTokenJson = (String) request.getAttribute("access_token_json");
+            if (StringUtil.isNotNEmpty(accessTokenJson)) {
+                responseString(response, accessTokenJson);
+                return;
+            }
         }
+        String url = extractWeChatUrl(request);
+        responseString(response, HttpUtil.wxSendGet(url, jsonData, CharSet.UTF8));
     }
     
     @RequestMapping(value = "/wxHttpPost")
     public void wxHttpPost(HttpServletRequest request, HttpServletResponse response) {
         String jsonData = request.getParameter("jsonData");
         if (StringUtil.isEmpty(jsonData)) {
-            httpPost(request, response);
-        } else {
-            String url = request.getParameter("url");
-            responseString(response, HttpUtil.wxSendPost(url, jsonData, CharSet.UTF8));
+            String accessTokenJson = (String) request.getAttribute("access_token_json");
+            if (StringUtil.isNotNEmpty(accessTokenJson)) {
+                responseString(response, accessTokenJson);
+                return;
+            }
         }
+        String url = extractWeChatUrl(request);
+        responseString(response, HttpUtil.wxSendPost(url, jsonData, CharSet.UTF8));
+    }
+    
+    /**
+     * 提取url
+     * @author quanyou.chen
+     * @date: 2017年7月27日 上午10:42:20
+     * @param request
+     * @return
+     */
+    private String extractWeChatUrl(HttpServletRequest request) {
+        StringBuilder queryStr = new StringBuilder(request.getParameter("url"));
+        if (queryStr.indexOf("?") > 0) {
+            queryStr.append('&');
+        } else {
+            queryStr.append('?');
+        }
+        // access_token
+        queryStr.append("access_token=");
+        queryStr.append(request.getAttribute("access_token"));
+        queryStr.append('&');
+        String name = null;
+        for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
+            name = e.nextElement();
+            if (name.equals("jsonData") || name.equals("url")) {
+                continue;
+            }
+            queryStr.append(name);
+            queryStr.append('=');
+            queryStr.append(request.getParameter(name));
+            queryStr.append('&');
+        }
+        queryStr.setLength(queryStr.length() - 1);
+        return queryStr.toString();
     }
 }

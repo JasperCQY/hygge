@@ -13,10 +13,10 @@ import org.springframework.scheduling.support.CronTrigger;
  * @date: 2017年6月8日 上午11:05:57
  * @version  v 1.0
  */
-public class IFCTrigger implements Trigger {
+public class SimpleTrigger implements Trigger {
     private String expression;
     
-    public IFCTrigger(String expression) {
+    public SimpleTrigger(String expression) {
         this.expression = expression;
     }
     

@@ -19,7 +19,7 @@ public class DynamicScheduledTask implements SchedulingConfigurer {
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
         // 证书
-        IFCTask certificateCleanTask =
+        SimpleScheduled certificateCleanTask =
             new WeChatTokenSche(weChatConf);
         taskRegistrar.addTriggerTask(certificateCleanTask.triggerTask());
     }

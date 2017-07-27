@@ -5,13 +5,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.szyooge.config.WeChatConf;
 import com.szyooge.util.CryptUtil;
+import com.szyooge.util.MDC_LOG;
 import com.szyooge.util.SortUtil;
+import com.szyooge.util.StringUtil;
+
 /**
  * 微信推送消息
  * @ClassName: WeChatPushController
@@ -23,14 +25,17 @@ import com.szyooge.util.SortUtil;
 public class WeChatPushController extends BaseController {
     private static Logger logger = LoggerFactory.getLogger(WeChatPushController.class);
     
-    @Autowired
-    private WeChatConf weChatConf;
+    @Value("${wechat.config.token}")
+    private String token;
     
     @RequestMapping("/wechatpush")
     public void wxAccess(HttpServletRequest request, HttpServletResponse response) {
-        String token = weChatConf.getAccessToken();
-        
+        MDC_LOG.add();
         String signature = request.getParameter("signature");
+        if (StringUtil.isNEmpty(signature)) {
+            logger.warn("微信推送数据不合法（获取不到【signature】）。");
+            return;
+        }
         String timestamp = request.getParameter("timestamp");
         String nonce = request.getParameter("nonce");
         String echostr = request.getParameter("echostr");
@@ -50,5 +55,6 @@ public class WeChatPushController extends BaseController {
         } else {
             logger.info("消息不是来自微信");
         }
+        MDC_LOG.remove();
     }
 }

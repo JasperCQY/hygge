@@ -12,7 +12,7 @@ import org.springframework.scheduling.config.TriggerTask;
  * @date: 2017年6月8日 上午10:46:08
  * @version  v 1.0
  */
-public abstract class IFCTask {
+public abstract class SimpleScheduled {
     
     /**
      * 每分
@@ -64,10 +64,7 @@ public abstract class IFCTask {
      */
     protected Map<String, String> dict;
     
-    private TriggerTask scheduledTask;
-    
-    public IFCTask() {
-    }
+    private TriggerTask triggerTask;
     
     /**
      * taskRun
@@ -100,10 +97,10 @@ public abstract class IFCTask {
     protected abstract String setExpression();
     
     public TriggerTask triggerTask() {
-        if (scheduledTask == null) {
-            scheduledTask = new TriggerTask(task(), trigger());
+        if (triggerTask == null) {
+            triggerTask = new TriggerTask(task(), trigger());
         }
-        return scheduledTask;
+        return triggerTask;
     }
     
     /**
@@ -126,7 +123,7 @@ public abstract class IFCTask {
      * @return Runnable 返回值
      */
     private Runnable task() {
-        return new RedisCleanTaskRunnel();
+        return new TriggerTaskRunnel();
     }
     
     /**
@@ -138,17 +135,17 @@ public abstract class IFCTask {
      */
     private Trigger trigger() {
         this.initExpression();
-        return new IFCTrigger(expression);
+        return new SimpleTrigger(expression);
     }
     
-    private class RedisCleanTaskRunnel implements Runnable {
+    private class TriggerTaskRunnel implements Runnable {
         @Override
         public void run() {
             initDict();
             // 设置任务时间
             setExpression();
             // 设置下一个任务时间
-            ((IFCTrigger)scheduledTask.getTrigger()).setExpression(expression);
+            ((SimpleTrigger)triggerTask.getTrigger()).setExpression(expression);
             taskRun();
         }
     }

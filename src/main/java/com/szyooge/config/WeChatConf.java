@@ -26,9 +26,19 @@ public class WeChatConf {
     @Value("${wechat.clientcredential}")
     private String clientCredential;
     
-    private String accessToken;
+    private static String accessToken;
     
-    private String accessTokenJson;
+    private static String accessTokenJson;
+    
+    private static WeChatConf th;
+    
+    public WeChatConf(){
+        th = this;
+    }
+    
+    public static WeChatConf instance(){
+        return th;
+    }
     
     public synchronized String requestAccessToken() {
         Map<String, String> param = new HashMap<>();

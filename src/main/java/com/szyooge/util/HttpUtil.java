@@ -71,7 +71,12 @@ public class HttpUtil {
     }
     
     public static String sendGet(String url, Map<String, String> param, String charset) {
-        StringBuffer buffer = new StringBuffer();
+        StringBuffer buffer = new StringBuffer(url);
+        if (buffer.indexOf("?") > 0) {
+            buffer.append('&');
+        } else {
+            buffer.append('?');
+        }
         if (param != null && !param.isEmpty()) {
             try {
                 for (Map.Entry<String, String> entry : param.entrySet()) {
@@ -85,9 +90,8 @@ public class HttpUtil {
             }
             
         }
-        buffer.deleteCharAt(buffer.length() - 1);
-        url = url + "?" + buffer;
-        return sendGet(url, charset);
+        buffer.setLength(buffer.length() - 1);
+        return sendGet(buffer.toString(), charset);
     }
     
     /**
@@ -117,14 +121,16 @@ public class HttpUtil {
             conn.setRequestProperty("connection", "Keep-Alive");
             conn.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
             // 发送POST请求必须设置如下两行
-            conn.setDoOutput(true);
             conn.setDoInput(true);
-            // 获取URLConnection对象对应的输出流
-            out = new PrintWriter(conn.getOutputStream());
-            // 发送请求参数
-            out.print(param);
-            // flush输出流的缓冲
-            out.flush();
+            if (StringUtil.isNotNEmpty(param)) {
+                conn.setDoOutput(true);
+                // 获取URLConnection对象对应的输出流
+                out = new PrintWriter(conn.getOutputStream());
+                // 发送请求参数
+                out.print(param);
+                // flush输出流的缓冲
+                out.flush();
+            }
             // 定义BufferedReader输入流来读取URL的响应
             in = new BufferedReader(new InputStreamReader(conn.getInputStream(), charset));
             String line;
@@ -173,8 +179,8 @@ public class HttpUtil {
             } catch (UnsupportedEncodingException e) {
                 log.error("发送 POST 请求出现异常", e);
             }
+            buffer.setLength(buffer.length() - 1);
         }
-        buffer.deleteCharAt(buffer.length() - 1);
         
         PrintWriter out = null;
         BufferedReader in = null;
@@ -188,14 +194,16 @@ public class HttpUtil {
             conn.setRequestProperty("connection", "Keep-Alive");
             conn.setRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36");
             // 发送POST请求必须设置如下两行
-            conn.setDoOutput(true);
             conn.setDoInput(true);
-            // 获取URLConnection对象对应的输出流
-            out = new PrintWriter(conn.getOutputStream());
-            // 发送请求参数
-            out.print(buffer);
-            // flush输出流的缓冲
-            out.flush();
+            if (buffer != null && buffer.length() > 0) {
+                conn.setDoOutput(true);
+                // 获取URLConnection对象对应的输出流
+                out = new PrintWriter(conn.getOutputStream());
+                // 发送请求参数
+                out.print(buffer);
+                // flush输出流的缓冲
+                out.flush();
+            }
             // 定义BufferedReader输入流来读取URL的响应
             in = new BufferedReader(new InputStreamReader(conn.getInputStream(), charset));
             String line;
@@ -254,7 +262,7 @@ public class HttpUtil {
         log.info("客户端IP=" + ip);
         return ip;
     }
-
+    
     public static String wxSendGet(String url, String jsonStr, String charset) {
         log.info("发起GET请求URL：" + url);
         log.info("发起GET应答字符编码：" + charset);
@@ -270,7 +278,7 @@ public class HttpUtil {
             connection.setRequestProperty("connection", "Keep-Alive");
             connection.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
             // 建立实际的连接
-            if(StringUtil.isNotEmpty(jsonStr)){
+            if (StringUtil.isNotEmpty(jsonStr)) {
                 connection.setDoOutput(true);
                 out = new PrintWriter(connection.getOutputStream());
                 // 发送请求参数
@@ -303,7 +311,7 @@ public class HttpUtil {
         log.info("GET请求应答：" + result);
         return result;
     }
-
+    
     public static String wxSendPost(String url, String jsonStr, String charset) {
         log.info("发起POST请求URL：" + url);
         log.info("发起POST请求参数：" + jsonStr);
@@ -315,7 +323,7 @@ public class HttpUtil {
         try {
             URL realUrl = new URL(url);
             // 打开和URL之间的连接
-            HttpURLConnection conn = (HttpURLConnection)realUrl.openConnection();
+            HttpURLConnection conn = (HttpURLConnection) realUrl.openConnection();
             // 设置通用的请求属性
             conn.setRequestProperty("accept", "application/json, text/javascript, */*; q=0.01");
             conn.setRequestProperty("connection", "Keep-Alive");
@@ -323,7 +331,7 @@ public class HttpUtil {
             // 发送POST请求必须设置如下两行
             conn.setDoInput(true);
             // 获取URLConnection对象对应的输出流
-            if(StringUtil.isNotEmpty(jsonStr)){
+            if (StringUtil.isNotEmpty(jsonStr)) {
                 conn.setDoOutput(true);
                 out = new PrintWriter(conn.getOutputStream());
                 // 发送请求参数

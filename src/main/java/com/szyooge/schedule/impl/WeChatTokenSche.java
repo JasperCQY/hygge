@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.szyooge.config.WeChatConf;
-import com.szyooge.schedule.IFCTask;
+import com.szyooge.schedule.SimpleScheduled;
 import com.szyooge.util.MDC_LOG;
 
 /**
@@ -14,7 +14,7 @@ import com.szyooge.util.MDC_LOG;
  * @date: 2017年6月8日 上午11:15:58
  * @version  v 1.0
  */
-public class WeChatTokenSche extends IFCTask {
+public class WeChatTokenSche extends SimpleScheduled {
     private static final Logger log = LoggerFactory.getLogger(WeChatTokenSche.class);
     
     private WeChatConf weChatConf;
@@ -26,7 +26,7 @@ public class WeChatTokenSche extends IFCTask {
     
     @Override
     protected String setExpression() {
-        this.expression = "0 0/110 * * * ?";
+        this.expression = "0 0/30 0/1 * * ?";
         return this.expression;
     }
     

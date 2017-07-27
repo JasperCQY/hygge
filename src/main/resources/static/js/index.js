@@ -11,14 +11,12 @@ var index = {
         $("#expiresin").val(data.expires_in);
     },
     getcallbackip : function(){
-        var data = wechat.public.getcallbackip({
-            access_token:$("#accesstoken").val()
-        });
+        var data = wechat.public.getcallbackip();
         $("#console").val(JSON.stringify(data));
     },
     menu : {
         create : function(){
-            var data = wechat.public.menu.create($("#accesstoken").val(),{
+            var data = wechat.public.menu.create({
                 button:[{  
                    "type":"click",
                    "name":"今日歌曲",
@@ -26,6 +24,14 @@ var index = {
                    url : "http://www.yooge.xin/hygger/wechatpush/menuclick"
                 }]
             });
+            $("#console").val(JSON.stringify(data));
+        },
+        get : function(){
+            var data = wechat.public.menu.get();
+            $("#console").val(JSON.stringify(data));
+        },
+        "delete" : function(){
+            var data = wechat.public.menu.delete();
             $("#console").val(JSON.stringify(data));
         }
     }
