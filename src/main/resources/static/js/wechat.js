@@ -181,6 +181,31 @@ wechat.public.customservice = {
 };
 
 /**
+ * 发送消息-群发接口和原创校验
+ */
+wechat.public.media = {
+    /**
+     * 上传图文消息内的图片获取URL【订阅号与服务号认证后均可用】
+     */
+    uploadimg : function(opts, jsonData){
+        
+    },
+    /**
+     * 上传图文消息素材【订阅号与服务号认证后均可用】
+     */
+    uploadnews : function(opts, jsonData) {
+        
+    }
+};
+
+/**
+ * 发送消息-模板消息接口(用于发送重要通知)
+ */
+wechat.public.template = {
+        
+};
+
+/**
  * 关注用户
  */
 wechat.public.user = {

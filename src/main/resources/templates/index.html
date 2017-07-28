@@ -2,41 +2,25 @@
 <head>
 <meta charset="UTF-8" />
 <link href="images/icon.ico" rel="shortcut icon"/>
-<link href="css/index.css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="js/jquery/easyui/themes/bootstrap/easyui.css">
+<link rel="stylesheet" type="text/css" href="js/jquery/easyui/themes/icon.css">
+<link href="css/index.css" rel="stylesheet"/>
 <script type="text/javascript" src="js/jquery/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="js/jquery/easyui/jquery.easyui.min.js"></script>
 <script type="text/javascript" src="js/https.js"></script>
 <script type="text/javascript" src="js/wechat.js"></script>
 <script type="text/javascript" src="js/index.js"></script>
 </head>
-<body>
-	<div style="border: 1px solid black;">
-        <!-- 获取access token -->
-		<table>
-			<tr>
-				<td>AppID</td>
-				<td><input class="width300" id="appid" value="wx1089e8cbd29c7312"/></td>
-			</tr>
-			<tr>
-				<td>AppSecret</td>
-				<td><input class="width300" id="appsecret"
-					value="3ebc86a9c435559da61cc50a859c82f5" /></td>
-			</tr>
-			<tr>
-				<td>access_token</td>
-				<td><input class="width300" id="accesstoken" value="" /></td>
-			</tr>
-			<tr>
-				<td>expires_in</td>
-				<td><input class="width300" id="expiresin" value="" /></td>
-			</tr>
-			<tr>
-				<td><input type="button" value="获取"
-					onclick="index.getAccessToken()" /></td>
-				<td></td>
-			</tr>
-
-		</table>
-	</div>
+<body id="hygge_index" class="easyui-layout">   
+    <div data-options="region:'north',border:false,noheader:true" style="height:100px;">
+      <img alt="" src="images/head.jpg" width="100%" height="100%"/>
+    </div>   
+    <div data-options="region:'west',split:true,href:'menu'" style="width:150px;"></div>   
+    <div data-options="region:'center',noheader:true"></div>   
+    <div data-options="region:'south',noheader:true" style="height:40px;text-align: center;background-color: rgb(198,225,252);">
+      <div style="margin-top:10px;font-weight: 100">Copyright ©2017 Jasper</div>
+    </div>   
+	<!--
   
     <div style="border: 1px solid black;">
         <table>
@@ -58,6 +42,6 @@
     </div>
     <div style="position: absolute;bottom: 0px;">
       <textarea id="console" rows="10" cols="100"></textarea>
-    </div>
+    </div> -->
 </body>
 </html>

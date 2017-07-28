@@ -2,6 +2,9 @@ var index = {
     init : function() {
         
     },
+    clickMenu : function(url){
+        $("#hygge_index").layout("panel","center").panel("refresh",url);
+    },
     getAccessToken : function(){
         var data = wechat.public.getAccessToken({
             appid      : $("#appid").val(),

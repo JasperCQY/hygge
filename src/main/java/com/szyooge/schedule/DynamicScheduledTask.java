@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 import com.szyooge.config.WeChatConf;
-import com.szyooge.schedule.impl.WeChatTokenSche;
+import com.szyooge.wechat.schedule.WeChatTokenSche;
 
 @Configuration
 @EnableScheduling
