@@ -8,10 +8,12 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
+import com.szyooge.tuling.Robot;
 import com.szyooge.util.XmlUtil;
 import com.szyooge.wechat.constant.WeChatXmlConst;
 import com.szyooge.wechat.msgtype.service.WeChatMsgTypeService;
@@ -21,6 +23,9 @@ public class WeChatTextMsgImpl implements WeChatMsgTypeService {
     
     private static Logger logger = LoggerFactory.getLogger(WeChatTextMsgImpl.class);
 
+    @Autowired
+    private Robot robot;
+    
     @Override
     public String msg(Map<String, String> wxMap) {
         String replyXmlStr = null;
@@ -33,6 +38,8 @@ public class WeChatTextMsgImpl implements WeChatMsgTypeService {
             replyMap.put(WeChatXmlConst.FromUserName, wxMap.get(WeChatXmlConst.ToUserName));
             replyMap.put(WeChatXmlConst.ToUserName, wxMap.get(WeChatXmlConst.FromUserName));
             replyMap.put(WeChatXmlConst.CreateTime, String.valueOf(new Date().getTime()));
+            String replyMsg = robot.sendMsg(wxMap.get(WeChatXmlConst.FromUserName),wxMap.get(WeChatXmlConst.Content));
+            replyMap.put(WeChatXmlConst.Content, replyMsg);
             
             replyXmlStr = XmlUtil.mapToXmlStr(replyMap, in);
         } catch (IOException e) {
