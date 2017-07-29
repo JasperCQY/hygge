@@ -46,7 +46,7 @@ public class WeChatTextMsgImpl implements WeChatMsgTypeService {
             logger.info(replyMsg);
             try {
             	JSONObject robotReply = new JSONObject(replyMsg);
-            	if(RobotConst.DataType.TEXT.equals(robotReply.getString("code"))) {
+            	if(RobotConst.DataType.TEXT == robotReply.getInt("code")) {
             		context = robotReply.getString("text");
             	}
             	

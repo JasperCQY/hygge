@@ -15,26 +15,26 @@ public interface RobotConst {
     	/**
     	 * 文本
     	 */
-    	String TEXT = "100000";
+    	int TEXT = 100000;
     	/**
     	 * 链接
     	 */
-    	String LINK = "200000";
+    	int LINK = 200000;
     	/**
     	 * 新闻
     	 */
-    	String NEWS = "302000";
+    	int NEWS = 302000;
     	/**
     	 * 菜谱
     	 */
-    	String MENU = "308000";
+    	int MENU = 308000;
     	/**
     	 * 儿歌
     	 */
-    	String SONG = "313000";
+    	int SONG = 313000;
     	/**
     	 * 诗词
     	 */
-    	String POETRY = "314000";
+    	int POETRY = 314000;
     }
 }
