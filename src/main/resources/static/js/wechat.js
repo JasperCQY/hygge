@@ -68,7 +68,7 @@ var wechat = {
         }
         if(!method) params.type = "get";
         return wechat.callwechat(params);
-    },
+    }
 };
 
 /**
