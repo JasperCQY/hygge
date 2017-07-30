@@ -21,6 +21,26 @@ public class WeChatVoiceMsgImpl implements WeChatMsgTypeService {
     
     private static Logger logger = LoggerFactory.getLogger(WeChatVoiceMsgImpl.class);
 
+    /**
+     * @param wxMap <xml>
+<ToUserName><![CDATA[toUser]]></ToUserName>
+<FromUserName><![CDATA[fromUser]]></FromUserName>
+<CreateTime>1357290913</CreateTime>
+<MsgType><![CDATA[voice]]></MsgType>
+<MediaId><![CDATA[media_id]]></MediaId>
+<Format><![CDATA[Format]]></Format>
+<MsgId>1234567890123456</MsgId>
+</xml>
+     * @return <xml>
+<ToUserName><![CDATA[toUser]]></ToUserName>
+<FromUserName><![CDATA[fromUser]]></FromUserName>
+<CreateTime>12345678</CreateTime>
+<MsgType><![CDATA[voice]]></MsgType>
+<Voice>
+<MediaId><![CDATA[media_id]]></MediaId>
+</Voice>
+</xml>
+     */
     @Override
     public String msg(Map<String, String> wxMap) {
         String replyXmlStr = null;

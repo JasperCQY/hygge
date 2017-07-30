@@ -66,19 +66,19 @@ public class WeChatPushController extends BaseController {
             logger.info("消息来自微信");
             BufferedReader in = null;
             try {
-                in = new BufferedReader(new InputStreamReader(request.getInputStream()));
-                // 微信推送部分消息
-                String resultPart = in.readLine();
-                // 微信推送消息
-                StringBuilder wxMsg = new StringBuilder();
-                // 拼凑消息
-                while(resultPart != null) {
-                    wxMsg.append(resultPart);
-                    resultPart = in.readLine();
-                }
-                // 打印微信推送消息
-                logger.info(wxMsg.toString());
                 if(echostr == null) {
+                	in = new BufferedReader(new InputStreamReader(request.getInputStream()));
+                    // 微信推送部分消息
+                    String resultPart = in.readLine();
+                    // 微信推送消息
+                    StringBuilder wxMsg = new StringBuilder();
+                    // 拼凑消息
+                    while(resultPart != null) {
+                        wxMsg.append(resultPart);
+                        resultPart = in.readLine();
+                    }
+                    // 打印微信推送消息
+                    logger.info(wxMsg.toString());
                     echostr = weChatPushService.wxAccess(wxMsg.toString());
                 }
             } catch (IOException e) {

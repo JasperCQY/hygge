@@ -1,8 +1,13 @@
 package com.szyooge.util;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -115,8 +120,9 @@ public class HttpUtil {
         try {
             URL realUrl = new URL(url);
             // 打开和URL之间的连接
-            URLConnection conn = realUrl.openConnection();
+            HttpURLConnection conn = (HttpURLConnection) realUrl.openConnection();
             // 设置通用的请求属性
+            conn.setRequestMethod("POST");
             conn.setRequestProperty("accept", "*/*");
             conn.setRequestProperty("connection", "Keep-Alive");
             conn.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
@@ -188,8 +194,9 @@ public class HttpUtil {
         try {
             URL realUrl = new URL(url);
             // 打开和URL之间的连接
-            URLConnection conn = realUrl.openConnection();
+            HttpURLConnection conn = (HttpURLConnection) realUrl.openConnection();
             // 设置通用的请求属性
+            conn.setRequestMethod("POST");
             conn.setRequestProperty("accept", "application/json, text/javascript, */*; q=0.01");
             conn.setRequestProperty("connection", "Keep-Alive");
             conn.setRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36");
@@ -325,6 +332,7 @@ public class HttpUtil {
             // 打开和URL之间的连接
             HttpURLConnection conn = (HttpURLConnection) realUrl.openConnection();
             // 设置通用的请求属性
+            conn.setRequestMethod("POST");
             conn.setRequestProperty("accept", "application/json, text/javascript, */*; q=0.01");
             conn.setRequestProperty("connection", "Keep-Alive");
             conn.setRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36");
@@ -364,5 +372,134 @@ public class HttpUtil {
         log.info("POST请求应答：" + result);
         return result;
     }
+    
+    public static String uploadFile(String url, String fileFullName, String charset) {
+        log.info("发起POST请求参数：" + fileFullName);
+        
+        String result = "";
+        File file = new File(fileFullName);
+        String fileName = file.getName();
+        InputStream fileIn = null;
+		try {
+			fileIn = new FileInputStream(file);
+			result = uploadFile(url,fileName,fileIn,charset);
+			log.info("POST请求应答：" + result);
+		} catch (FileNotFoundException e) {
+			log.error("文件不存在！", e);
+		} finally {
+			if(fileIn != null){
+				try {
+					fileIn.close();
+				} catch (IOException e) {
+					log.error("关闭文件流异常！", e);
+				}
+			}
+		}
+        
+        return result;
+    }
+    
+    public static String uploadFile(String url, String fileName, InputStream fileIn, String charset) {
+    	log.info("发起POST请求URL：" + url);
+    	log.info("发起POST请求参数：" + fileName);
+    	log.info("发起POST应答字符编码：" + charset);
+    	
+    	OutputStream out = null;
+    	BufferedReader in = null;
+    	String result = "";
+    	byte[] fileData = new byte[512];
+    	int len = 0;
+    	try {
+    		URL realUrl = new URL(url);
+    		// 打开和URL之间的连接
+    		HttpURLConnection conn = (HttpURLConnection) realUrl.openConnection();
+    		// 设置通用的请求属性
+    		conn.setRequestMethod("POST");
+    		conn.addRequestProperty("FileName", fileName);
+    		conn.setRequestProperty("content-type", "text/html");
+    		// 发送POST请求必须设置如下两行
+    		conn.setDoInput(true);
+    		// 获取URLConnection对象对应的输出流
+    		if (StringUtil.isNotEmpty(fileName)) {
+    			conn.setDoOutput(true);
+    			out = conn.getOutputStream();
+    			while((len = fileIn.read(fileData)) > 0) {
+    				// 发送请求参数
+    				out.write(fileData, 0, len);
+    			}
+    			// flush输出流的缓冲
+    			out.flush();
+    		}
+    		// 定义BufferedReader输入流来读取URL的响应
+    		in = new BufferedReader(new InputStreamReader(conn.getInputStream(), charset));
+    		String line;
+    		while ((line = in.readLine()) != null) {
+    			result += line;
+    		}
+    	} catch (Exception e) {
+    		log.error("发送 POST 请求出现异常！", e);
+    	}
+    	// 使用finally块来关闭输出流、输入流
+    	finally {
+    		try {
+    			if (out != null) {
+    				out.close();
+    			}
+    			if (in != null) {
+    				in.close();
+    			}
+    		} catch (IOException ex) {
+    			ex.printStackTrace();
+    		}
+    	}
+    	log.info("POST请求应答：" + result);
+    	return result;
+    }
+    public static byte[] downloadFile(String url, String charset) {
+    	log.info("发起POST请求URL：" + url);
+    	log.info("发起POST应答字符编码：" + charset);
+    	
+    	OutputStream out = null;
+    	InputStream in = null;
+    	String result = "";
+    	byte[] fileData = new byte[512];
+    	int len = 0;
+    	ByteBuilder bb = new ByteBuilder();
+    	try {
+    		URL realUrl = new URL(url);
+    		// 打开和URL之间的连接
+    		HttpURLConnection conn = (HttpURLConnection) realUrl.openConnection();
+    		// 设置通用的请求属性
+    		conn.setRequestProperty("content-type", "text/html");
+    		// 发送POST请求必须设置如下两行
+    		conn.setDoInput(true);
+    		
+    		// 定义BufferedReader输入流来读取URL的响应
+    		in = conn.getInputStream();
+    		while ((len = in.read(fileData)) > 0) {
+    			bb.append(fileData,len);
+    		}
+    		return bb.toBytes();
+    	} catch (Exception e) {
+    		log.error("发送 POST 请求出现异常！", e);
+    	}
+    	// 使用finally块来关闭输出流、输入流
+    	finally {
+    		try {
+    			if (out != null) {
+    				out.close();
+    			}
+    			if (in != null) {
+    				in.close();
+    			}
+    		} catch (IOException ex) {
+    			ex.printStackTrace();
+    		}
+    	}
+    	log.info("POST请求应答：" + result);
+    	return null;
+    }
+    
+    
     
 }
