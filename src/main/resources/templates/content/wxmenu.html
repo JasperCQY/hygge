@@ -12,31 +12,69 @@
 <script type="text/javascript" src="js/index.js"></script>
 </head>
 <body>   
-  <div style="border: 1px solid black;">
+  <div style="border: 1px solid black;width:370px;float: left;">
     <table>
       <tr>
-        <td>AppID</td>
-        <td><input class="width300" id="appid" value="wx1089e8cbd29c7312"/></td>
+        <td>创建菜单</td>
+        <td>
+          <textarea rows="5" cols="30" id="createMenuText">
+{
+  "button":[{  
+    "type":"click",
+    "name":"今日歌曲",
+    "key":"V1001_TODAY_MUSIC"
+  },{
+    "name":"菜单",
+    "sub_button":[{
+       "type":"view",
+       "name":"搜索",
+       "url":"http://www.yooge.xin/hygger/wechatpush/menuclick"
+    },{
+         "type":"miniprogram",
+         "name":"wxa",
+         "url":"http://mp.weixin.qq.com",
+         "appid":"wx286b93c14bbf93aa",
+         "pagepath":"pages/lunar/index"
+     },{
+       "type":"click",
+       "name":"赞一下我们",
+       "key":"V1001_GOOD"
+    }]
+  }]
+}
+          </textarea>
+        </td>
       </tr>
       <tr>
-        <td>AppSecret</td>
-        <td><input class="width300" id="appsecret"
-          value="3ebc86a9c435559da61cc50a859c82f5" /></td>
-      </tr>
-      <tr>
-        <td>access_token</td>
-        <td><input class="width300" id="accesstoken" value="" /></td>
-      </tr>
-      <tr>
-        <td>expires_in</td>
-        <td><input class="width300" id="expiresin" value="" /></td>
-      </tr>
-      <tr>
-        <td><input type="button" value="获取"
-          onclick="index.getAccessToken()" /></td>
+        <td><input type="button" value="创建"
+          onclick="index.menu.create()" /></td>
         <td></td>
       </tr>
     </table>
   </div>
+    
+    
+    
+  <div style="border: 1px solid black;width:80px;float: left;">  
+    <table>
+      <tr>
+        <td><input type="button" value="全部删除"
+          onclick="index.menu.delete()" /></td>
+        <td></td>
+      </tr>
+    </table>
+  </div>
+  <div style="border: 1px solid black;width:370px;float: left;">  
+    <table style="width:370px;">
+      <tr>
+        <td><input type="button" value="查询"
+          onclick="index.menu.get()" /></td>
+      </tr>
+      <tr>
+        <td id="menuGetText"></td>
+      </tr>
+    </table>
+  </div>
+  <div id="wxmenuConsole" style="width:100%;"></div>
 </body>
 </html>

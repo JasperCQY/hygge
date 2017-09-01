@@ -8,8 +8,8 @@ import com.szyooge.schedule.SimpleScheduled;
 import com.szyooge.util.MDC_LOG;
 
 /**
- * RSA过期清理
- * @ClassName: CertificateCleanTaskImpl
+ * 定期获取access_token
+ * @ClassName: WeChatTokenSche
  * @author quanyou.chen
  * @date: 2017年6月8日 上午11:15:58
  * @version  v 1.0

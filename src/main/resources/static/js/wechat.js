@@ -66,7 +66,7 @@ var wechat = {
                 params.data = {access_token:opts};
             }
         }
-        if(!method) params.type = "get";
+        params.type = (!!method) ? method : "get";
         return wechat.callwechat(params);
     }
 };
@@ -123,20 +123,20 @@ wechat.public.menu = {
      * 
      * @return 正确{"errcode":0,"errmsg":"ok"}，错误{"errcode":40018,"errmsg":"invalid button name size"}
      */
-    create : function(opts,jsonData){
-        return wechat.opration(opts, jsonData, "https://api.weixin.qq.com/cgi-bin/menu/create", "post");
+    create : function(jsonData){
+        return wechat.opration(null, jsonData, "https://api.weixin.qq.com/cgi-bin/menu/create", "post");
     },
     /**
      * 获取所有的菜单
      */
-    get : function(opts, jsonData){
-        return wechat.opration(opts, jsonData, "https://api.weixin.qq.com/cgi-bin/menu/get");
+    get : function(){
+        return wechat.opration(null, null, "https://api.weixin.qq.com/cgi-bin/menu/get");
     },
     /**
      * 删除所有的菜单
      */
     "delete" : function() {
-        return wechat.opration(opts, jsonData, "https://api.weixin.qq.com/cgi-bin/menu/delete");
+        return wechat.opration(null,null,"https://api.weixin.qq.com/cgi-bin/menu/delete");
     }
 };
 
@@ -197,6 +197,26 @@ wechat.public.media = {
         
     }
 };
+
+/**
+ * 永久素材
+ */
+wechat.public.material = {
+    /**
+     * 批量获取素材（分页）
+     * @param jsonData {"type":TYPE,   "offset":OFFSET,   "count":COUNT}
+     */
+    batchget : function(jsonData){
+        return wechat.opration(null, jsonData, "https://api.weixin.qq.com/cgi-bin/material/batchget_material");
+    },
+    /**
+     * 素材数量
+     * @return { "voice_count":COUNT, "video_count":COUNT, "image_count":COUNT, "news_count":COUNT}
+     */
+    getCount : function(){
+        return wechat.opration(null, null, "https://api.weixin.qq.com/cgi-bin/material/get_materialcount");
+    }
+}
 
 /**
  * 发送消息-模板消息接口(用于发送重要通知)
