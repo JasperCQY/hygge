@@ -4,6 +4,8 @@ import java.io.File;
 
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.http11.Http11NioProtocol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -25,7 +27,7 @@ import com.szyooge.interceptor.WeChatUrlImterceptor;
 @Configuration
 @EnableConfigurationProperties(WebAppConfigurer.TomcatSslConnectorProperties.class)
 public class WebAppConfigurer extends WebMvcConfigurerAdapter {
-    
+    private static Logger logger = LoggerFactory.getLogger(WebAppConfigurer.class);
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // 多个拦截器组成一个拦截器链
@@ -90,6 +92,8 @@ public class WebAppConfigurer extends WebMvcConfigurerAdapter {
                 }
                 protocol.setKeyAlias(keyAlias);
                 protocol.setKeyPass(keyStorePassword);
+            } else {
+                logger.error("找不到.keystore文件"); 
             }
         }
         

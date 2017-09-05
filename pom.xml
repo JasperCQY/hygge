@@ -178,6 +178,14 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+				  <!-- maven 会把resource里的文件里面的占位符替换，从而导致文件读取问题  -->
+                  <nonFilteredFileExtensions>
+                    <nonFilteredFileExtension>keystore</nonFilteredFileExtension>
+                    <nonFilteredFileExtension>p12</nonFilteredFileExtension>
+                    <nonFilteredFileExtension>jks</nonFilteredFileExtension>
+                  </nonFilteredFileExtensions>
+                </configuration>
 			</plugin>
 		</plugins>
 	</build>
