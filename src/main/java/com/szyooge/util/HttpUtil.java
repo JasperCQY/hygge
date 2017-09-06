@@ -29,6 +29,11 @@ public class HttpUtil {
     
     private static Logger log = LoggerFactory.getLogger(HttpUtil.class);
     
+    static {
+        // 解决错误javax.net.ssl.SSLProtocolException: handshake alert: unrecognized_name
+        System.setProperty ("jsse.enableSNIExtension", "false");
+    }
+    
     /**
      * 使用Get方式获取数据
      * 
