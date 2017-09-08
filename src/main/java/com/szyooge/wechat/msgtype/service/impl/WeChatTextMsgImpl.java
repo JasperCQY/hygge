@@ -6,8 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +18,9 @@ import com.szyooge.util.XmlUtil;
 import com.szyooge.wechat.constant.CmdConst;
 import com.szyooge.wechat.constant.WeChatXmlConst;
 import com.szyooge.wechat.msgtype.service.WeChatMsgTypeService;
+
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
 
 @Service(WeChatXmlConst.IMsgType.text)
 public class WeChatTextMsgImpl implements WeChatMsgTypeService {
@@ -35,7 +36,6 @@ public class WeChatTextMsgImpl implements WeChatMsgTypeService {
         Map<String, String> replyMap = new HashMap<String, String>(wxMap);
         InputStream in = null;
         try {
-            
             replyMap.put(WeChatXmlConst.FromUserName, wxMap.get(WeChatXmlConst.ToUserName));
             replyMap.put(WeChatXmlConst.ToUserName, wxMap.get(WeChatXmlConst.FromUserName));
             replyMap.put(WeChatXmlConst.CreateTime, String.valueOf(new Date().getTime()));
@@ -44,7 +44,7 @@ public class WeChatTextMsgImpl implements WeChatMsgTypeService {
             String replyMsg = robot.sendMsg(wxMap.get(WeChatXmlConst.FromUserName), context);
             logger.info(replyMsg);
             try {
-                JSONObject robotReply = new JSONObject(replyMsg);
+                JSONObject robotReply = JSONObject.fromObject(replyMsg);
                 if (RobotConst.DataType.TEXT == robotReply.getInt("code")) {
                     context = robotReply.getString("text");
                     // 对指令的处理

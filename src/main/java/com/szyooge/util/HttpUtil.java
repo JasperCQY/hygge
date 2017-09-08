@@ -16,7 +16,11 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -504,7 +508,123 @@ public class HttpUtil {
     	log.info("POST请求应答：" + result);
     	return null;
     }
-    
-    
+    public static void main(String[] args) {
+        Map<String,String> param = new HashMap<String,String>();
+        Map<String,String> data = new HashMap<String,String>();
+        param.put("URL", "https://login.wx.qq.com/jslogin");
+        data.put("appid", "wx782c26e4c19acffb");
+        data.put("fun", "new");
+        data.put("redirect", "https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxnewloginpage");
+        data.put("lang", "zh_CN");
+        data.put("_", String.valueOf(new Date().getTime()));
+        System.out.println(request(param,data,"UTF-8"));
+    }
+    /**
+     * http请求
+     * @param params {               <br/>
+     *     URL     : URL,            <br/>
+     *     Method  : METHOD,         <br/>
+     *     Cookie  : COOKIE,         <br/>
+     *     Payload : PAYLOAD,        <br/>
+     *     ...                       <br/>
+     * }                             <br/>
+     * @param data 
+     */
+    public static Map<String,String> request(Map<String,String> params, Map<String,String> data, String charset){
+        log.info("request开始");
+        log.info(params.toString());
+        log.info(data.toString());
+        Map<String,String> resultMap = new HashMap<String,String>();
+        StringBuilder url = new StringBuilder(params.remove("URL"));
+        if(url.indexOf("?") > 0) {
+            url.append("&");
+        } else {
+            url.append("?");
+        }
+        if(data != null && !data.isEmpty()) {
+            for(Entry<String, String> item : data.entrySet()) {
+                url.append(item.getKey()).append("=").append(item.getValue()).append("&");
+            }
+        }
+        url.setLength(url.length()-1);
+        
+        String payload = params.remove("Payload");
+        String cookie = params.remove("Cookie");
+        String method = params.remove("Method");
+        method = (StringUtil.isNotEmpty(method) && method.toUpperCase().equals("POST")) ? "POST" : "GET";
+        
+        PrintWriter out = null;
+        BufferedReader in = null;
+        String result = "";
+        try {
+            URL realUrl = new URL(url.toString());
+            // 打开和URL之间的连接
+            HttpURLConnection conn = (HttpURLConnection) realUrl.openConnection();
+            // 设置通用的请求属性
+            conn.setRequestMethod(method);
+            conn.setRequestProperty("accept", "application/json, text/javascript, */*; q=0.01");
+            conn.setRequestProperty("connection", "Keep-Alive");
+            conn.setRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36");
+            if(StringUtil.isNotEmpty(cookie)) {
+                conn.setRequestProperty("Cookie",cookie);
+            }
+            if(!params.isEmpty()) {
+                for(Entry<String, String> item : params.entrySet()) {
+                    conn.setRequestProperty(item.getKey(),item.getValue());
+                }
+            }
+            // 发送POST请求必须设置如下两行
+            conn.setDoInput(true);
+            // 获取URLConnection对象对应的输出流
+            if (StringUtil.isNotEmpty(payload)) {
+                conn.setDoOutput(true);
+                out = new PrintWriter(conn.getOutputStream());
+                // 发送请求参数
+                out.print(payload);
+                // flush输出流的缓冲
+                out.flush();
+            }
+            // 定义BufferedReader输入流来读取URL的响应
+            in = new BufferedReader(new InputStreamReader(conn.getInputStream(), charset));
+            String line = null;
+            while ((line = in.readLine()) != null) {
+                result += line;
+            }
+            resultMap.put("Response", result);
+            
+            Map<String, List<String>> responseHead = conn.getHeaderFields();
+            if(responseHead != null) {
+                List<String> cookies = responseHead.get("Set-Cookie");
+                if(cookies != null) {
+                    StringBuilder setCookie = new StringBuilder();
+                    for(String co : cookies) {
+                        setCookie.append(co).append(";");
+                    }
+                    if(setCookie.length() > 0) {
+                        setCookie.setLength(setCookie.length()-1);
+                    }
+                    resultMap.put("Set-Cookie", setCookie.toString());
+                }
+            }
+        } catch (Exception e) {
+            log.error("发送 request 请求出现异常！", e);
+        }
+        // 使用finally块来关闭输出流、输入流
+        finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+                if (in != null) {
+                    in.close();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        log.info("request请求应答：" + resultMap);
+        
+        return resultMap;
+    }
     
 }

@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import com.szyooge.constant.CharSet;
 
+import net.sf.json.JSONObject;
+import net.sf.json.JSONArray;
+
 public abstract class BaseController {
     private static Logger logger = LoggerFactory.getLogger(BaseController.class);
     
@@ -21,9 +24,23 @@ public abstract class BaseController {
             logger.error("response输出流出异常啦", e);
         }
     }
-    public void responseJson(HttpServletResponse response, Object obj){
-        response.reset();
-        response.setCharacterEncoding(CharSet.UTF8);
-//        response.getWriter().write(Jsono);
+    public void responseObject(HttpServletResponse response, Object obj){
+        try {
+            response.reset();
+            response.setCharacterEncoding(CharSet.UTF8);
+            response.getWriter().write(JSONObject.fromObject(obj).toString());
+        } catch (IOException e) {
+            logger.error("response输出流出异常啦", e);
+        }
+    }
+    
+    public void responseArray(HttpServletResponse response, Object obj){
+        try {
+            response.reset();
+            response.setCharacterEncoding(CharSet.UTF8);
+            response.getWriter().write(JSONArray.fromObject(obj).toString());
+        } catch (IOException e) {
+            logger.error("response输出流出异常啦", e);
+        }
     }
 }
